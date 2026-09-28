@@ -75,7 +75,7 @@ def main() -> int:
         if missing_tools:
             print("\nInstall the missing tools; a TeX distribution with LuaLaTeX and latexmk is required. Then rerun this command.")
         return 1
-    print("\nWorkspace ready. Start the Runner and open http://127.0.0.1:8053/.")
+    print("\nWorkspace ready. Start the Runner. The Windows launcher opens its selected local URL; start.sh uses port 8053 by default.")
     return 0
 
 

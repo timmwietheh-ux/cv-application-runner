@@ -14,14 +14,17 @@ param(
     # resolved below because Windows PowerShell 5.1, which the shortcut uses,
     # leaves $PSScriptRoot empty inside parameter defaults.
     [string]$ProjectRoot = '',
-    [int]$Port = 8053,
+    # Zero selects an available port, preferring an already running instance
+    # of this checkout. Passing a port keeps that choice strict.
+    [ValidateRange(0, 65535)]
+    [int]$Port = 0,
     [switch]$NoBrowser
 )
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $ProjectRoot) { $ProjectRoot = Join-Path $scriptDir '..\..' }
-$url = "http://127.0.0.1:$Port"
+$url = $null
 $serverScript = Join-Path $scriptDir 'server.py'
 $httpClient = $null
 
@@ -48,12 +51,35 @@ function Get-LogTail([string]$Path) {
     }
 }
 
-function Get-RunnerHealth {
+function Get-RunnerHealth([int]$CandidatePort) {
     try {
-        $json = $httpClient.GetStringAsync("$url/api/health").GetAwaiter().GetResult()
+        $json = $httpClient.GetStringAsync("http://127.0.0.1:$CandidatePort/api/health").GetAwaiter().GetResult()
         return $json | ConvertFrom-Json
     } catch {
         return $null
+    }
+}
+
+function Test-OwnRunner($Health) {
+    if (-not $Health -or $Health.app -ne 'latex-runner' -or -not $Health.root) { return $false }
+    try {
+        $healthRoot = (Resolve-Path -LiteralPath ([string]$Health.root)).Path
+        return [string]::Equals($healthRoot, $resolvedRoot,
+            [System.StringComparison]::OrdinalIgnoreCase)
+    } catch {
+        return $false
+    }
+}
+
+function Test-PortAvailable([int]$CandidatePort) {
+    $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $CandidatePort)
+    try {
+        $listener.Start()
+        return $true
+    } catch {
+        return $false
+    } finally {
+        $listener.Stop()
     }
 }
 
@@ -89,15 +115,34 @@ try {
     $httpClient.Timeout = [TimeSpan]::FromMilliseconds(900)
 
     $resolvedRoot = (Resolve-Path -LiteralPath $ProjectRoot).Path
-    $health = Get-RunnerHealth
-    if ($health) {
-        if ($health.app -ne 'latex-runner' -or
-            -not [string]::Equals((Resolve-Path -LiteralPath $health.root).Path, $resolvedRoot,
-                [System.StringComparison]::OrdinalIgnoreCase)) {
-            Show-RunnerError "Port $Port is already used by another application or project."
-            exit 1
+    $reuse = $false
+    if ($Port -eq 0) {
+        $firstFreePort = 0
+        foreach ($candidatePort in 8053..8073) {
+            if (Test-PortAvailable $candidatePort) {
+                if ($firstFreePort -eq 0) { $firstFreePort = $candidatePort }
+                continue
+            }
+            if (Test-OwnRunner (Get-RunnerHealth $candidatePort)) {
+                $Port = $candidatePort
+                $reuse = $true
+                break
+            }
         }
-        if (-not $NoBrowser) { Open-RunnerBrowser }
+        if (-not $reuse) {
+            if ($firstFreePort -eq 0) { throw 'No free local port was found from 8053 through 8073.' }
+            $Port = $firstFreePort
+        }
+    } else {
+        if (Test-OwnRunner (Get-RunnerHealth $Port)) {
+            $reuse = $true
+        } elseif (-not (Test-PortAvailable $Port)) {
+            throw "Port $Port is already used by another application or project."
+        }
+    }
+    $url = "http://127.0.0.1:$Port"
+    if ($reuse) {
+        if ($NoBrowser) { Write-Output $url } else { Open-RunnerBrowser }
         exit 0
     }
 
@@ -141,7 +186,7 @@ try {
     $deadline = [DateTime]::UtcNow.AddSeconds(15)
     do {
         Start-Sleep -Milliseconds 200
-        $health = Get-RunnerHealth
+        $health = Get-RunnerHealth $Port
         # A server that exits at once (import error, port taken) cannot become
         # ready; report it now instead of after the full timeout.
         if (-not $health -and $server.HasExited) { break }
@@ -155,8 +200,15 @@ try {
         if ($reason) { $message += "`n`n$reason" }
         throw "$message`n`nLogs: $logDir"
     }
-    if (-not $NoBrowser) { Open-RunnerBrowser }
+    if (-not (Test-OwnRunner $health)) {
+        throw "Port $Port was taken by another application or project during startup."
+    }
+    if ($NoBrowser) { Write-Output $url } else { Open-RunnerBrowser }
 } catch {
-    Show-RunnerError $_.Exception.Message
+    if ($NoBrowser) {
+        [Console]::Error.WriteLine($_.Exception.Message)
+    } else {
+        Show-RunnerError $_.Exception.Message
+    }
     exit 1
 }

@@ -33,7 +33,7 @@ macOS or Linux:
     python3 scripts/bootstrap.py
     sh start.sh
 
-Open http://127.0.0.1:8053/ after starting the Runner. The server listens on this computer only. For an assistant-guided first run, copy the ready prompt in docs/START_WITH_AI.md into Codex or Claude Code while the clone is the active folder.
+On Windows, the launcher opens the Runner in your browser. It reuses this checkout's running server or chooses an available local port from 8053 through 8073, so another Runner can stay open. To see the chosen URL without opening a browser, run `pwsh -File scripts/editor/start-background.ps1 -NoBrowser`. On macOS or Linux, open http://127.0.0.1:8053/ after `sh start.sh`; if that port is occupied, pass another port, for example `sh start.sh 8054`. The server listens on this computer only. For an assistant-guided first run, copy the ready prompt in docs/START_WITH_AI.md into Codex or Claude Code while the clone is the active folder.
 
 ## Work in the Runner
 
