@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaTeX Runner CV Edition — LaTeX &amp; files</title>
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/statistics.css">
+</head>
+<body>
+
+  <!-- ================= TOP BAR ================= -->
+  <header id="topbar">
+    <div class="bar-group bar-side bar-side-left">
+      <div class="brand" title="LaTeX Runner CV Edition">
+        <img class="brand-mark" src="/static/img/favicon.svg" alt="" width="22" height="22">
+        <span class="brand-name">LaTeX Runner CV Edition</span>
+      </div>
+      <span id="project-chip" class="project-chip" title="Project"></span>
+      <button id="branch-badge" class="chip chip-button" title="Open source control">
+        <i class="fa-solid fa-code-branch"></i><span id="current-branch">main</span>
+      </button>
+    </div>
+
+    <div class="bar-group bar-center">
+      <a href="/" style="color:#005AA9;text-decoration:none;font-weight:700;padding:8px 14px;border:1px solid #cbd8e5;border-radius:7px">Applications</a>
+      <div id="workspace-mode-switch" class="workspace-mode-switch" role="group" aria-label="Workspace mode" hidden>
+        <button class="workspace-mode-btn active" data-workspace-mode="latex" aria-pressed="true">
+          <i class="fa-solid fa-book-open"></i><span>LaTeX</span>
+        </button>
+        <button class="workspace-mode-btn" data-workspace-mode="numerics" aria-pressed="false">
+          <i class="fa-solid fa-code"></i><span>Numerics</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bar-group bar-side bar-side-right">
+      <div class="header-actions-reserved" aria-label="Document actions">
+      <span id="save-indicator" class="save-indicator" data-state="saved" title="All changes are saved">
+        <i class="fa-solid fa-circle-check"></i><span id="save-indicator-text">All saved</span>
+      </span>
+      <span class="divider-v"></span>
+      <button id="btn-save" class="btn btn-ghost" title="Save now (Ctrl+S)">
+        <i class="fa-solid fa-floppy-disk"></i><span>Save</span>
+      </button>
+      <button id="btn-sync-forward" class="btn btn-ghost pdf-only-control" title="Show the cursor position in the PDF (Ctrl+Alt+J)">
+        <i class="fa-solid fa-location-crosshairs"></i><span>Sync&nbsp;to&nbsp;PDF</span>
+      </button>
+      </div>
+      <span id="dirty-chip" class="chip chip-dirty" hidden title="Files with unsaved changes">
+        <i class="fa-solid fa-circle"></i><span id="dirty-count">0</span> unsaved
+      </span>
+      <button id="btn-toggle-drawer" class="btn btn-icon" title="Console and diff (Ctrl+`)">
+        <i class="fa-solid fa-terminal"></i>
+      </button>
+      <button id="btn-settings" class="btn btn-icon" title="Settings"><i class="fa-solid fa-gear"></i></button>
+    </div>
+  </header>
+
+  <!-- ================= WORKSPACE ================= -->
+  <div id="workspace">
+
+    <!-- ---------- LEFT: SIDEBAR ---------- -->
+    <aside id="pane-sidebar" class="pane">
+      <nav class="rail" aria-label="Panels">
+        <button class="rail-btn active" data-panel="panel-workspace" title="Files and outline"><i class="fa-solid fa-folder-tree"></i></button>
+        <button class="rail-btn" data-panel="panel-review" title="Review comments">
+          <i class="fa-solid fa-comments"></i><span id="comments-count" class="rail-badge" hidden>0</span>
+        </button>
+        <button class="rail-btn" data-panel="panel-git" title="Source control">
+          <i class="fa-solid fa-code-commit"></i><span id="git-count" class="rail-badge" hidden>0</span>
+        </button>
+        <button class="rail-btn" data-panel="panel-statistics" title="Statistics" aria-label="Statistics"><i class="fa-solid fa-chart-column"></i></button>
+        <button class="rail-btn" id="rail-ai" data-panel="panel-ai" title="AI workspace: handoff, contracts, research">
+          <i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-count" class="rail-badge" hidden>0</span>
+        </button>
+        <button class="rail-btn" id="rail-calculation-map" data-panel="panel-calculation-map" title="Rechenlandkarte" aria-label="Rechenlandkarte"><i class="fa-solid fa-map"></i></button>
+        <span class="rail-spacer"></span>
+      </nav>
+
+      <div class="rail-panels">
+        <section id="panel-calculation-map" class="panel"></section>
+
+        <!-- Workspace: explorer above, outline below -->
+        <section id="panel-workspace" class="panel active">
+          <div class="stack">
+            <div class="stack-pane" id="stack-explorer">
+              <header class="panel-head">
+                <span id="workspace-files-title" class="panel-title">CV sources</span>
+                <div class="panel-actions">
+                  <button id="btn-toggle-full-repo" class="panel-text-action" title="Show every repository file"><i class="fa-solid fa-box-archive"></i><span>Full repo</span></button>
+                  <button id="btn-new-file" title="New file"><i class="fa-solid fa-file-circle-plus"></i></button>
+                  <button id="btn-new-folder" title="New folder"><i class="fa-solid fa-folder-plus"></i></button>
+                  <button id="btn-refresh-files" title="Refresh"><i class="fa-solid fa-arrows-rotate"></i></button>
+                </div>
+              </header>
+              <div class="panel-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="file-filter" placeholder="Find a file (Ctrl+P)" autocomplete="off" spellcheck="false">
+              </div>
+              <div id="file-tree" class="tree scroll-y"></div>
+            </div>
+
+            <div class="stack-split" id="stack-split" title="Drag to resize"></div>
+
+            <div class="stack-pane" id="stack-outline">
+              <header class="panel-head">
+                <span id="workspace-outline-title" class="panel-title">Document outline</span>
+                <div class="panel-actions">
+                  <button id="btn-outline-search" title="Filter sections"><i class="fa-solid fa-magnifying-glass"></i></button>
+                  <button id="btn-refresh-outline" title="Rebuild outline"><i class="fa-solid fa-arrows-rotate"></i></button>
+                </div>
+              </header>
+              <div class="panel-search" id="outline-search-row" hidden>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="outline-filter" placeholder="Filter sections" autocomplete="off" spellcheck="false">
+              </div>
+              <div id="outline-list" class="outline scroll-y"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Review comments -->
+        <section id="panel-review" class="panel">
+          <header class="panel-head">
+            <span class="panel-title">Review</span>
+            <div class="panel-actions">
+              <div class="segmented segmented-sm" id="comments-filter" role="group" aria-label="Comment filter">
+                <button class="seg-btn active" data-filter="open">Open <span class="seg-count" id="comments-open-count">0</span></button>
+                <button class="seg-btn" data-filter="resolved">Resolved <span class="seg-count" id="comments-resolved-count">0</span></button>
+                <button class="seg-btn" data-filter="all">All</button>
+              </div>
+            </div>
+          </header>
+          <p class="panel-hint">Select text in the editor and press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd>.</p>
+          <div id="comments-list" class="comments scroll-y"></div>
+        </section>
+
+        <!-- Git -->
+        <section id="panel-git" class="panel">
+          <header class="panel-head">
+            <span class="panel-title">Source control</span>
+            <div class="panel-actions">
+              <button id="btn-git-refresh" title="Refresh status"><i class="fa-solid fa-arrows-rotate"></i></button>
+              <button id="btn-git-pull" title="Pull"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+              <button id="btn-git-push" title="Push local commits to origin/main"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+            </div>
+          </header>
+          <div id="git-remote-summary" class="git-remote-summary">Checking repository…</div>
+          <div class="git-body scroll-y">
+            <div class="git-primary-actions" aria-label="Bulk staging actions">
+              <button id="btn-git-stage-all" class="btn btn-primary" title="Stage every current change">
+                <i class="fa-solid fa-plus"></i><span>Stage All</span>
+              </button>
+              <button id="btn-git-unstage-all" class="btn btn-secondary" title="Unstage all files">
+                <i class="fa-solid fa-minus"></i><span>Unstage All</span>
+              </button>
+            </div>
+            <div class="git-status-summary" aria-label="Git file counts">
+              <span>Staged <b id="git-staged-count">0</b></span>
+              <span>Changed <b id="git-modified-count">0</b></span>
+              <span>Untracked <b id="git-untracked-count">0</b></span>
+            </div>
+            <div class="commit-box">
+              <textarea id="git-commit-msg" rows="2" placeholder="Commit message…" spellcheck="false"></textarea>
+              <button id="btn-git-commit" class="btn btn-primary btn-block" title="Commit staged files and push directly to origin/main">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span id="git-commit-label">Commit and Push</span>
+              </button>
+              <p class="hint-inline">Staged files → commit → origin/main. Unstaged changes stay local.</p>
+              <p id="git-publish-status" class="hint-inline" role="status" aria-live="polite"></p>
+            </div>
+            <div id="git-change-groups" class="git-change-groups" aria-live="polite"></div>
+            <div class="git-section">
+              <div class="git-section-title">
+                History <span id="git-graph-count" class="count">0</span>
+                <span class="hint-inline">right-click a commit for details</span>
+              </div>
+              <div id="git-graph" class="git-graph"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-statistics" class="panel">
+          <header class="panel-head">
+            <span class="panel-title">Statistics</span>
+            <div class="panel-actions">
+              <button id="stats-refresh" title="Recalculate statistics" aria-label="Recalculate statistics"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>
+          </header>
+          <div class="stats-tabs" role="group" aria-label="Statistics views">
+            <button data-stats-tab="overview" class="active" aria-pressed="true">Overview</button>
+            <button data-stats-tab="paragraphs" aria-pressed="false">Paragraphs</button>
+            <button data-stats-tab="repository" aria-pressed="false">Repo</button>
+          </div>
+          <div id="stats-status" class="stats-status" role="status" aria-live="polite">Calculated locally, on demand.</div>
+          <div id="stats-content" class="stats-content scroll-y"></div>
+        </section>
+
+        <!-- AI workspace -->
+        <section id="panel-ai" class="panel">
+          <header class="panel-head">
+            <span class="panel-title">AI workspace</span>
+            <span id="ai-live" class="ai-live" title="Updates automatically when agents write files"><i></i>Live</span>
+            <div class="panel-actions">
+              <button id="btn-refresh-ai" title="Rescan"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>
+          </header>
+          <div class="ai-body scroll-y">
+            <div id="ai-handoff" class="ai-handoff" hidden></div>
+            <div id="ai-summary" class="ai-summary" aria-label="Current AI status"></div>
+            <div id="ai-actions" class="ai-actions" aria-label="AI shortcuts"></div>
+
+            <div class="ai-block collapsed" data-block="active">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-active"><i class="fa-solid fa-chevron-down"></i><span>Active contracts</span><span id="ai-active-count" class="count">0</span></button>
+              <div id="ai-active" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="comments">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-open-comments"><i class="fa-solid fa-chevron-down"></i><span>Open comments</span><span id="ai-comments-count" class="count">0</span></button>
+              <div id="ai-open-comments" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="workflow">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-pipeline"><i class="fa-solid fa-chevron-down"></i><span>Contract workflow</span></button>
+              <div id="ai-pipeline" class="ai-block-body ai-pipeline" aria-label="Contract workflow"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="activity">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-activity"><i class="fa-solid fa-chevron-down"></i><span>Recent activity</span><span id="ai-activity-count" class="count">0</span></button>
+              <div id="ai-activity" class="ai-block-body ai-timeline"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="research">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-research"><i class="fa-solid fa-chevron-down"></i><span>Research dossiers</span><span id="ai-research-count" class="count">0</span></button>
+              <div id="ai-research" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="prompts">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-prompts"><i class="fa-solid fa-chevron-down"></i><span>Prompts</span><span id="ai-prompts-count" class="count">0</span></button>
+              <div id="ai-prompts" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="dossiers">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-dossiers"><i class="fa-solid fa-chevron-down"></i><span>Briefs &amp; reviews</span><span id="ai-dossiers-count" class="count">0</span></button>
+              <div id="ai-dossiers" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="archive">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-archive"><i class="fa-solid fa-chevron-down"></i><span>Contract archive</span><span id="ai-archive-count" class="count">0</span></button>
+              <div id="ai-archive" class="ai-block-body"></div>
+            </div>
+            <div class="ai-block collapsed" data-block="governance">
+              <button type="button" class="ai-block-head" aria-expanded="false" aria-controls="ai-governance"><i class="fa-solid fa-chevron-down"></i><span>Agreements</span></button>
+              <div id="ai-governance" class="ai-block-body ai-governance"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tools -->
+        <section id="panel-tools" class="panel" hidden aria-hidden="true">
+          <header class="panel-head">
+            <span class="panel-title">Tools</span>
+            <div class="panel-actions">
+              <button id="btn-add-category" title="New category"><i class="fa-solid fa-folder-plus"></i></button>
+              <button id="btn-reset-runners" title="Restore the project's tool palette"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+          </header>
+          <div id="runner-groups" class="runner-groups scroll-y"></div>
+          <div class="tools-footer">
+            <input type="text" id="custom-cmd" placeholder="Run a command in the project folder…" spellcheck="false" autocomplete="off">
+            <button id="btn-run-custom" class="btn-tool" title="Run once"><i class="fa-solid fa-play"></i></button>
+            <button id="btn-add-runner" class="btn-tool" title="Save as a new tool"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- ---------- CENTER: EDITOR ---------- -->
+    <section id="pane-editor" class="pane">
+      <div id="editor-tabs" class="tabbar"></div>
+
+      <div class="editor-subbar">
+        <div id="breadcrumb" class="breadcrumb"></div>
+        <div class="subbar-actions">
+          <button id="btn-md-preview" class="icon-toggle" title="Toggle Markdown preview" hidden>
+            <i class="fa-solid fa-eye"></i>
+          </button>
+          <button id="btn-add-comment" class="icon-toggle" title="Comment on selection (Ctrl+Alt+M)">
+            <i class="fa-solid fa-comment-medical"></i>
+          </button>
+          <button id="btn-mark-blue" class="icon-toggle mark-blue" title="Mark selection blue (Ctrl+Alt+B). The dot in the left margin removes it again.">
+            <i class="fa-solid fa-highlighter"></i>
+          </button>
+          <button id="btn-split-editor" class="icon-toggle" title="Split the editor (Ctrl+Alt+\)">
+            <i class="fa-solid fa-table-columns"></i>
+          </button>
+          <button id="btn-wrap-toggle" class="icon-toggle active" title="Toggle word wrap">
+            <i class="fa-solid fa-arrow-turn-down"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="conflict-bar" class="conflict-bar" hidden role="alert">
+        <i class="fa-solid fa-code-merge"></i>
+        <div class="conflict-text">
+          <strong id="conflict-title">This file changed on disk</strong>
+          <span id="conflict-detail">Another program (for example an agent) saved it while you had unsaved edits. Autosave is paused for this file.</span>
+        </div>
+        <div class="conflict-actions">
+          <button id="btn-conflict-compare" class="btn btn-secondary btn-sm"><i class="fa-solid fa-code-compare"></i> Compare</button>
+          <button id="btn-conflict-theirs" class="btn btn-secondary btn-sm" title="Discard your edits and load the version on disk">Load disk version</button>
+          <button id="btn-conflict-mine" class="btn btn-primary btn-sm" title="Overwrite the disk version with your text">Keep mine</button>
+        </div>
+      </div>
+
+      <div class="editor-body">
+        <div id="monaco-host"></div>
+        <div id="monaco-split" class="monaco-split" hidden></div>
+        <div id="md-preview" class="md-preview" hidden></div>
+      </div>
+
+      <div class="statusbar">
+        <span id="status-position">Ln 1, Col 1</span>
+        <span class="divider-v"></span>
+        <span id="status-language">latex</span>
+        <span class="divider-v"></span>
+        <span id="status-file-state">saved</span>
+        <span class="flex-spacer"></span>
+        <span id="status-message"></span>
+        <span id="status-project" class="status-project"></span>
+      </div>
+    </section>
+
+    <!-- ---------- RIGHT: PDF / LOGS ---------- -->
+    <section id="pane-viewer" class="pane">
+
+      <header id="latex-viewer-head" class="viewer-head">
+        <div class="viewer-head-row">
+          <div class="compile-group">
+            <button id="btn-recompile" class="btn btn-compile" title="Save and recompile (Ctrl+Enter)">
+              <i class="fa-solid fa-rotate"></i><span id="recompile-label">Recompile</span>
+            </button>
+            <button id="btn-stop-compile" class="btn btn-compile-stop" title="Stop the running compile" hidden>
+              <i class="fa-solid fa-stop"></i>
+            </button>
+          </div>
+          <div class="segmented">
+            <button id="btn-view-pdf" class="seg-btn active" data-view="pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button id="btn-view-logs" class="seg-btn" data-view="logs"><i class="fa-solid fa-list-check"></i> Logs</button>
+          </div>
+          <span id="compile-status" class="chip chip-status" title="Compile status">Ready</span>
+          <span class="flex-spacer"></span>
+          <span class="issue-badges">
+            <button class="ibadge ibadge-error" data-filter="errors" title="Errors"><i class="fa-solid fa-circle-exclamation"></i><span id="badge-errors">0</span></button>
+            <button class="ibadge ibadge-warn" data-filter="warnings" title="Warnings"><i class="fa-solid fa-triangle-exclamation"></i><span id="badge-warnings">0</span></button>
+            <button class="ibadge ibadge-box" data-filter="boxes" title="Bad boxes"><i class="fa-solid fa-ruler-combined"></i><span id="badge-boxes">0</span></button>
+          </span>
+        </div>
+        <div id="compile-progress" class="compile-progress" hidden><span></span></div>
+
+        <div class="viewer-head-row viewer-tools" id="pdf-tools">
+          <div class="tool-cluster">
+            <button id="pdf-back" class="btn-tool" title="Back to where the last link or sync jump started (Alt+Left)" disabled>
+              <i class="fa-solid fa-arrow-left-long"></i>
+            </button>
+            <button id="pdf-prev" class="btn-tool" title="Previous page"><i class="fa-solid fa-chevron-up"></i></button>
+            <span class="page-indicator">
+              <input type="number" id="pdf-page-input" value="1" min="1" aria-label="Page number">
+              <span class="page-sep">/</span>
+              <span id="pdf-page-count">–</span>
+            </span>
+            <button id="pdf-next" class="btn-tool" title="Next page"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <span class="divider-v"></span>
+          <div class="tool-cluster">
+            <button id="pdf-zoom-out" class="btn-tool" title="Zoom out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+            <select id="pdf-zoom" class="mini-select" aria-label="Zoom">
+              <option value="page-width">Fit width</option>
+              <option value="page-fit">Fit page</option>
+              <option value="auto">Automatic</option>
+              <option value="0.75">75%</option>
+              <option value="1.0">100%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+              <option value="2.0">200%</option>
+            </select>
+            <button id="pdf-zoom-in" class="btn-tool" title="Zoom in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+          </div>
+          <span class="flex-spacer"></span>
+          <button id="pdf-open-external" class="btn-tool" title="Open the PDF in a new tab">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </button>
+        </div>
+      </header>
+
+      <header id="numerics-viewer-head" class="viewer-head numerics-viewer-head" hidden>
+        <div class="viewer-head-row">
+          <div class="compile-group">
+            <button id="btn-run-active" class="btn btn-compile" title="Save and run the selected calculation chamber (Ctrl+Enter)">
+              <i class="fa-solid fa-play"></i><span>Run chamber</span>
+            </button>
+            <button id="btn-stop-numerics" class="btn btn-compile-stop" title="Stop the active numerical job" hidden>
+              <i class="fa-solid fa-stop"></i>
+            </button>
+          </div>
+          <div id="numerics-actions" class="numerics-actions" aria-label="Selected calculation chamber"></div>
+          <span id="numerics-status" class="chip chip-status">Ready</span>
+          <span class="flex-spacer"></span>
+          <button id="btn-refresh-artifacts" class="btn-tool" title="Refresh figures and measurement data"><i class="fa-solid fa-arrows-rotate"></i></button>
+        </div>
+        <div class="viewer-head-row numerics-context-row">
+          <i class="fa-solid fa-flask"></i>
+          <span id="numerics-context">Choose a pipeline or open a source file.</span>
+        </div>
+      </header>
+
+      <!-- PDF stream -->
+      <div id="view-pdf" class="viewer-view active">
+        <div id="pdf-scroll" class="pdf-scroll">
+          <div id="pdf-pages" class="pdf-pages"></div>
+        </div>
+        <div id="pdf-empty" class="empty-state" hidden>
+          <i class="fa-solid fa-file-circle-question"></i>
+          <p>No compiled PDF yet.</p>
+          <button class="btn btn-primary" id="btn-empty-compile"><i class="fa-solid fa-rotate"></i> Compile now</button>
+        </div>
+        <div class="pdf-hint">Double-click a word to jump to its source</div>
+      </div>
+
+      <!-- Logs -->
+      <div id="view-logs" class="viewer-view">
+        <div class="logs-toolbar">
+          <div class="pills">
+            <button class="pill active" data-filter="all">All</button>
+            <button class="pill pill-error" data-filter="errors">Errors <span id="pill-errors">0</span></button>
+            <button class="pill pill-warn" data-filter="warnings">Warnings <span id="pill-warnings">0</span></button>
+            <button class="pill pill-box" data-filter="boxes">Bad boxes <span id="pill-boxes">0</span></button>
+          </div>
+          <div class="logs-toolbar-actions">
+            <button id="btn-raw-log" class="btn-tool" title="Toggle the raw log"><i class="fa-solid fa-file-lines"></i></button>
+            <button id="btn-back-to-pdf" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> PDF</button>
+          </div>
+        </div>
+        <div id="issues-list" class="issues scroll-y"></div>
+        <pre id="raw-log" class="raw-log scroll-y" hidden></pre>
+      </div>
+
+      <!-- Numerical artifact and console workspace -->
+      <div id="view-numerics" class="viewer-view numerics-viewer">
+        <section class="artifact-stage">
+          <header class="artifact-stage-head">
+            <div>
+              <strong id="artifact-title">Active manuscript results</strong>
+              <span id="artifact-path">Choose a calculation chamber</span>
+            </div>
+            <div class="result-tabs" role="tablist" aria-label="Numerical result type">
+              <button class="result-tab active" data-result-mode="figures" role="tab" aria-label="Figures"><i class="fa-solid fa-chart-line"></i><span class="result-tab-label">Figures</span><span id="result-figure-count">0</span></button>
+              <button class="result-tab" data-result-mode="measurements" role="tab" aria-label="Measurements"><i class="fa-solid fa-table"></i><span class="result-tab-label">Measurements</span><span id="result-data-count">0</span></button>
+            </div>
+            <button id="btn-open-artifact" class="btn-tool" title="Open the selected result" disabled><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+          </header>
+          <div id="artifact-preview" class="artifact-preview">
+            <img id="artifact-image" alt="Active manuscript figure" hidden>
+            <iframe id="artifact-pdf" title="Generated numerical PDF" hidden></iframe>
+            <div id="measurement-table-wrap" class="measurement-table-wrap" hidden>
+              <div id="measurement-meta" class="measurement-meta"></div>
+              <div class="measurement-scroll"><table id="measurement-table" class="measurement-table"></table></div>
+            </div>
+            <div id="artifact-empty" class="empty-state">
+              <i class="fa-solid fa-chart-line"></i>
+              <p>Select a calculation chamber and one of its active results.</p>
+            </div>
+          </div>
+          <div id="artifact-filmstrip" class="artifact-filmstrip" aria-label="Active numerical results"></div>
+        </section>
+        <section class="numerics-console-dock">
+          <header class="numerics-console-head">
+            <strong><i class="fa-solid fa-terminal"></i> Console</strong>
+            <span id="numerics-console-context" class="chip chip-muted"></span>
+            <span class="flex-spacer"></span>
+            <button id="btn-numerics-stop" class="btn btn-icon" title="Stop the active console job" disabled><i class="fa-solid fa-stop"></i></button>
+            <button id="btn-numerics-clear" class="btn btn-icon" title="Clear console"><i class="fa-solid fa-ban"></i></button>
+          </header>
+          <div id="numerics-console-home" class="console-home"></div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= BOTTOM DRAWER ================= -->
+  <div id="drawer" class="drawer collapsed">
+    <div id="drawer-resize" class="drawer-resize"></div>
+    <header class="drawer-head">
+      <div class="drawer-tabs">
+        <button class="drawer-tab active" data-tab="drawer-console"><i class="fa-solid fa-terminal"></i> Console</button>
+        <button class="drawer-tab" data-tab="drawer-diff"><i class="fa-solid fa-code-compare"></i> Diff</button>
+      </div>
+      <div class="drawer-meta">
+        <span id="drawer-context" class="chip chip-muted"></span>
+        <button id="btn-stop-console" class="btn btn-icon" title="Stop the active console job" disabled><i class="fa-solid fa-stop"></i></button>
+        <button id="btn-clear-console" class="btn btn-icon" title="Clear console"><i class="fa-solid fa-ban"></i></button>
+        <button id="btn-close-drawer" class="btn btn-icon" title="Close drawer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </header>
+    <div class="drawer-body">
+      <div id="drawer-console" class="drawer-panel active">
+        <div id="drawer-console-home" class="console-home">
+          <div id="console-tabs" class="console-tabs"></div>
+          <div id="console-sessions" class="console-sessions">
+            <div id="console-empty" class="console-empty">Run a tool or compile to open a console session.</div>
+          </div>
+        </div>
+      </div>
+      <div id="drawer-diff" class="drawer-panel">
+        <div id="diff-empty" class="empty-state small">
+          <i class="fa-solid fa-code-compare"></i>
+          <p>Pick a changed file in Source control to compare it with HEAD.</p>
+        </div>
+        <div id="diff-title" class="diff-title" hidden></div>
+        <div id="monaco-diff"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+  <div id="modal-settings" class="modal">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3><i class="fa-solid fa-sliders"></i> Settings</h3>
+        <button class="modal-close" data-close="modal-settings"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="settings-group">
+          <h4>Saving</h4>
+          <label class="field field-check">
+            <input type="checkbox" id="cfg-autosave">
+            <span>Save automatically while typing</span>
+          </label>
+          <label class="field">
+            <span>Autosave after a pause of</span>
+            <select id="cfg-autosave-delay">
+              <option value="600">0.6 s</option>
+              <option value="1200">1.2 s</option>
+              <option value="2500">2.5 s</option>
+              <option value="5000">5 s</option>
+            </select>
+          </label>
+          <p class="field-hint">Autosave never overwrites a file that another program changed; you decide in the conflict bar. Files marked as agreements are only saved manually.</p>
+        </div>
+        <div class="settings-group">
+          <h4>Compiler</h4>
+          <label class="field">
+            <span>Engine</span>
+            <select id="cfg-engine">
+              <option value="lualatex">LuaLaTeX</option>
+              <option value="pdflatex">pdfLaTeX</option>
+              <option value="xelatex">XeLaTeX</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Command</span>
+            <input type="text" id="cfg-command" spellcheck="false">
+          </label>
+          <label class="field field-check">
+            <input type="checkbox" id="cfg-progressive">
+            <span>Show the PDF after every LaTeX pass</span>
+          </label>
+          <label class="field field-check">
+            <input type="checkbox" id="cfg-auto-compile">
+            <span>Recompile automatically after saving</span>
+          </label>
+        </div>
+        <div class="settings-group">
+          <h4>Editor</h4>
+          <label class="field">
+            <span>Font size</span>
+            <input type="number" id="cfg-font-size" min="10" max="28">
+          </label>
+          <label class="field">
+            <span>Tab size</span>
+            <input type="number" id="cfg-tab-size" min="1" max="8">
+          </label>
+          <label class="field field-check">
+            <input type="checkbox" id="cfg-word-wrap">
+            <span>Word wrap</span>
+          </label>
+          <label class="field field-check">
+            <input type="checkbox" id="cfg-minimap">
+            <span>Show minimap</span>
+          </label>
+        </div>
+        <div class="settings-group">
+          <h4>Viewer</h4>
+          <label class="field">
+            <span>Default zoom</span>
+            <select id="cfg-zoom">
+              <option value="page-width">Fit width</option>
+              <option value="page-fit">Fit page</option>
+              <option value="auto">Automatic</option>
+              <option value="1.0">100%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+            </select>
+          </label>
+        </div>
+        <div class="settings-group">
+          <h4>Project</h4>
+          <div id="project-info" class="project-info"></div>
+        </div>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close="modal-settings">Cancel</button>
+        <button id="btn-save-settings" class="btn btn-primary">Save settings</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modal-comment" class="modal">
+    <div class="modal-card modal-sm">
+      <header class="modal-head">
+        <h3><i class="fa-solid fa-comment-dots"></i> Review comment</h3>
+        <button class="modal-close" data-close="modal-comment"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <div id="comment-anchor" class="anchor-preview"></div>
+        <textarea id="comment-text" rows="5" placeholder="What should change here, and why?"></textarea>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close="modal-comment">Cancel</button>
+        <button id="btn-submit-comment" class="btn btn-primary">Add comment</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modal-prompt" class="modal">
+    <div class="modal-card modal-sm">
+      <header class="modal-head">
+        <h3 id="prompt-title">Prompt</h3>
+        <button class="modal-close" data-close="modal-prompt"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <p id="prompt-message" class="prompt-message"></p>
+        <input type="text" id="prompt-input" spellcheck="false" autocomplete="off">
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close="modal-prompt">Cancel</button>
+        <button id="btn-prompt-ok" class="btn btn-primary">OK</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modal-runner" class="modal">
+    <div class="modal-card modal-sm">
+      <header class="modal-head">
+        <h3 id="runner-modal-title"><i class="fa-solid fa-play"></i> New tool</h3>
+        <button class="modal-close" data-close="modal-runner"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <label class="field field-stacked">
+          <span>Name</span>
+          <input type="text" id="runner-label" placeholder="Numerics quick tests" spellcheck="false">
+        </label>
+        <label class="field field-stacked">
+          <span>Command</span>
+          <input type="text" id="runner-command" placeholder="pwsh -File Numerics/run.ps1 -Action quick" spellcheck="false">
+        </label>
+        <label class="field field-stacked">
+          <span>Category</span>
+          <select id="runner-category"></select>
+        </label>
+        <p class="panel-hint">Runs in the project folder; output streams to the console drawer.</p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close="modal-runner">Cancel</button>
+        <button id="btn-save-runner" class="btn btn-primary">Save tool</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modal-unsaved" class="modal">
+    <div class="modal-card modal-sm">
+      <header class="modal-head">
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> Unsaved changes</h3>
+        <button class="modal-close" data-close="modal-unsaved"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <p id="unsaved-message" class="prompt-message"></p>
+      </div>
+      <footer class="modal-foot">
+        <button id="btn-unsaved-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-unsaved-discard" class="btn btn-danger">Don't save</button>
+        <button id="btn-unsaved-save" class="btn btn-primary">Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modal-confirm" class="modal">
+    <div class="modal-card modal-sm">
+      <header class="modal-head">
+        <h3 id="confirm-title">Confirm</h3>
+        <button class="modal-close" data-close="modal-confirm"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <p id="confirm-message" class="prompt-message"></p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" data-close="modal-confirm">Cancel</button>
+        <button id="btn-confirm-ok" class="btn btn-danger">Confirm</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="context-menu" class="context-menu" hidden></div>
+  <div id="toasts" class="toasts"></div>
+
+  <div id="boot-overlay" class="boot">
+    <div class="boot-inner">
+      <img class="boot-mark" src="/static/img/favicon.svg" alt="" width="54" height="54">
+      <span class="boot-title">LaTeX Runner</span>
+      <span class="boot-sub" id="boot-status">Starting the workspace…</span>
+    </div>
+  </div>
+
+  <script src="/static/js/latex-monarch.js"></script>
+  <script src="/static/js/pdf-viewer.js"></script>
+  <script src="/static/js/statistics.js"></script>
+  <script src="/static/js/dictation.js"></script>
+  <script src="/static/js/blue-markup.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

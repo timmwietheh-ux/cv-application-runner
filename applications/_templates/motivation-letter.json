@@ -1,0 +1,19 @@
+{
+  "kind": "letter",
+  "title": "Motivation letter starter",
+  "header": {"name": "", "headline": "[[TODO: professional headline]]", "tagline": "", "contacts": ["location", "email"]},
+  "recipient": "[[TODO: programme or organisation]]",
+  "place": "",
+  "date": "",
+  "subject": "Motivation for [[TODO: programme or role]]",
+  "salutation": "Dear Selection Committee,",
+  "bodyFrom": "",
+  "body": [
+    {"id": "motivation", "type": "paragraph", "text": "[[TODO: your real motivation]]"},
+    {"id": "experience", "type": "paragraph", "text": "[[TODO: relevant verified experience]]"},
+    {"id": "fit", "type": "paragraph", "text": "[[TODO: why this programme and what you hope to contribute]]"}
+  ],
+  "closing": "Kind regards,",
+  "signature": "",
+  "enclosures": ""
+}

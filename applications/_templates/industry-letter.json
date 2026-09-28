@@ -1,0 +1,19 @@
+{
+  "kind": "letter",
+  "title": "Industry letter starter",
+  "header": {"name": "", "headline": "[[TODO: professional headline]]", "tagline": "", "contacts": ["location", "email"]},
+  "recipient": "[[TODO: company and contact]]",
+  "place": "",
+  "date": "",
+  "subject": "Application for [[TODO: role]]",
+  "salutation": "Dear Hiring Team,",
+  "bodyFrom": "",
+  "body": [
+    {"id": "opening", "type": "paragraph", "text": "[[TODO: why this specific job]]"},
+    {"id": "example", "type": "paragraph", "text": "[[TODO: one relevant, verified example]]"},
+    {"id": "fit", "type": "paragraph", "text": "[[TODO: how you would contribute]]"}
+  ],
+  "closing": "Kind regards,",
+  "signature": "",
+  "enclosures": ""
+}

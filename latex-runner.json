@@ -1,0 +1,26 @@
+{
+  "name": "CV Application Runner",
+  "main": "src/certificates/certificates.tex",
+  "outDir": "build/runner",
+  "entryFiles": ["applications/example-application/cv.json", "applications/example-application/letter.json"],
+  "figureDirs": ["assets"],
+  "dataDir": ".latex-runner/data",
+  "ignore": ["build", "output", "tmp", "assets/attachments"],
+  "protected": {
+    "noDelete": ["AGENTS.md", ".agents/memory/cv_facts.md", "assets/attachments/"],
+    "confirmWrite": ["AGENTS.md", ".agents/memory/cv_facts.md", "assets/attachments/"]
+  },
+  "compile": {"engine": "lualatex", "command": ""},
+  "features": {"applications": true, "aiWorkspace": true},
+  "ai": {
+    "root": ".agents",
+    "handoff": ".agents/memory/change_log.md",
+    "research": "docs",
+    "governance": [
+      ["AGENTS.md", "Agent instructions"],
+      [".agents/memory/cv_facts.md", "Verified personal facts"],
+      ["TODO.md", "Open questions"],
+      ["applications/README.md", "Application workflow"]
+    ]
+  }
+}

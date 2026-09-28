@@ -1,0 +1,8 @@
+{
+  "name": "John Doe",
+  "note": "Fictional sample identity. Replace every field before using this workspace for a real application.",
+  "contacts": {
+    "location": {"icon": "map-marker-alt", "text": "Exampletown", "url": ""},
+    "email": {"icon": "envelope", "text": "john.doe@example.com", "url": "mailto:john.doe@example.com"}
+  }
+}

@@ -1,0 +1,25 @@
+build/
+output/
+.latex-runner/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+LaTeX Runner CV Edition.lnk
+assets/attachments/certificates/*
+!assets/attachments/certificates/.gitkeep
+*.aux
+*.bcf
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.tmp
+Thumbs.db
+.DS_Store

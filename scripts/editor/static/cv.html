@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LaTeX Runner CV Edition</title>
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+  <link rel="stylesheet" href="/static/css/cv.css">
+  <script src="/static/js/cv.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/static/img/favicon.svg" alt="" width="32" height="32">
+      <div><strong>LaTeX Runner</strong><span>CV Edition</span></div>
+    </div>
+    <nav class="workspace-switch" aria-label="Workspace mode">
+      <button id="mode-edit" type="button" class="active" aria-pressed="true">Create</button>
+      <button id="mode-print" type="button" aria-pressed="false">Print &amp; export</button>
+    </nav>
+    <div class="topbar-tools">
+      <span id="save-state" class="save-state">Ready</span>
+      <button id="theme-toggle" type="button" class="icon-button theme-toggle" aria-label="Use light mode" title="Use light mode">☀</button>
+      <a class="source-link" href="/code">LaTeX &amp; files</a>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Applications">
+      <div class="sidebar-head">
+        <div><span class="eyebrow">Workspace</span><h1>Applications</h1></div>
+        <button id="new-app" class="icon-button blue" title="New application" aria-label="New application">+</button>
+      </div>
+      <label class="search-label" for="app-search">Find an application</label>
+      <input id="app-search" class="search" type="search" placeholder="Search calls and CVs…">
+      <div id="app-list" class="app-list" aria-live="polite"></div>
+      <div class="sidebar-foot">Local workspace <span class="palette"><i></i><i></i><i></i></span></div>
+    </aside>
+
+    <main class="work" id="work">
+      <div id="empty-work" class="empty-work">
+        <img src="/static/img/favicon.svg" width="62" height="62" alt="">
+        <h2>Your applications, in one place.</h2>
+        <p>Choose an application to edit its content blocks and preview the PDF.</p>
+      </div>
+      <div id="app-work" hidden>
+        <section class="app-heading">
+          <div class="app-heading-text">
+            <span id="app-category" class="eyebrow"></span>
+            <h2 id="app-title"></h2>
+            <p id="app-summary"></p>
+          </div>
+          <div class="app-heading-side"><span id="app-status" class="status"></span><span id="app-deadline"></span></div>
+        </section>
+        <div id="doc-tabs" class="doc-tabs" role="tablist" aria-label="Application documents"></div>
+        <div id="doc-toolbar" class="doc-toolbar" hidden>
+          <div><strong id="doc-title"></strong><span id="doc-subtitle"></span></div>
+          <div class="toolbar-actions">
+            <button id="duplicate-doc" class="button subtle" title="Create a copy in this application">Duplicate</button>
+            <button id="save-doc" class="button subtle" disabled>Save</button>
+            <button id="build-doc" class="button primary">Build PDF</button>
+          </div>
+        </div>
+        <div id="work-content" class="work-content"></div>
+      </div>
+    </main>
+
+    <aside class="preview" aria-label="Document preview">
+      <div class="preview-head">
+        <div><span class="eyebrow">Live document</span><strong id="preview-title">PDF preview</strong></div>
+        <div class="preview-actions">
+          <button id="refresh-preview" class="icon-button" title="Refresh preview" aria-label="Refresh preview">↻</button>
+          <a id="open-pdf" class="icon-button" title="Open PDF in a new tab" aria-label="Open PDF in a new tab" target="_blank" rel="noopener" hidden>↗</a>
+        </div>
+      </div>
+      <div id="preview-body" class="preview-body"><div class="preview-empty">Select a PDF document to preview it here.</div></div>
+      <div id="preview-status" class="preview-status">Last successful build</div>
+    </aside>
+  </div>
+
+  <dialog id="new-app-dialog" class="modal">
+    <form id="new-app-form" method="dialog">
+      <header><div><span class="eyebrow">Create</span><h2>New application</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Close">×</button></header>
+      <p>Start with a block template or copy the content of an existing document. You can change the words and add blocks afterward.</p>
+      <div class="form-grid">
+        <label>Title<input name="title" required placeholder="e.g. PhD in Computational Physics"></label>
+        <label>Folder name<input name="slug" required pattern="[a-z0-9][a-z0-9-]{1,62}" placeholder="phd-computational-physics"></label>
+        <label>Category<select name="category" id="new-category"></select></label>
+        <label>Organization<input name="organization" placeholder="University or company"></label>
+        <label>Deadline<input name="deadline" type="date"></label>
+        <label>CV source<select name="cv" id="new-cv"></select></label>
+        <label>Letter source<select name="letter" id="new-letter"></select></label>
+        <label>Portal texts source<select name="texts" id="new-texts"></select></label>
+      </div>
+      <footer><button class="button subtle" value="cancel" formnovalidate>Cancel</button><button id="create-app" class="button primary" value="create">Create application</button></footer>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

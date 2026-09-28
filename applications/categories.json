@@ -1,0 +1,7 @@
+[
+  {"id": "general", "label": "General applications", "icon": "fa-id-card"},
+  {"id": "academic", "label": "Academic positions", "icon": "fa-flask"},
+  {"id": "industry", "label": "Industry", "icon": "fa-building"},
+  {"id": "phd", "label": "PhD & graduate schools", "icon": "fa-graduation-cap"},
+  {"id": "scholarship", "label": "Scholarships & programmes", "icon": "fa-award"}
+]

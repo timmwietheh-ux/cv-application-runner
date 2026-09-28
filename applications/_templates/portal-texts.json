@@ -1,0 +1,9 @@
+{
+  "kind": "texts",
+  "title": "Portal texts starter",
+  "portal": "",
+  "intro": "Copy exact questions and limits from the live application form before writing.",
+  "fields": [
+    {"id": "motivation", "title": "Motivation", "prompt": "[[TODO: exact portal prompt]]", "limit": 3000, "required": true, "status": "draft", "text": "", "notes": "Use only verified facts."}
+  ]
+}

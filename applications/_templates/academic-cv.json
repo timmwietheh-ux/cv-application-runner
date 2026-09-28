@@ -1,0 +1,12 @@
+{
+  "kind": "cv",
+  "title": "Academic CV starter",
+  "header": {"name": "", "headline": "[[TODO: your professional headline]]", "tagline": "[[TODO: your current role]]", "contacts": ["location", "email"]},
+  "footer": "Curriculum Vitae",
+  "sections": [
+    {"id": "profile", "title": "Profile", "blocks": [{"id": "summary", "type": "summary", "text": "[[TODO: two or three verified sentences about your work and interests]]"}]},
+    {"id": "education", "title": "Education", "blocks": [{"id": "degree", "type": "entry", "date": "[[TODO: dates]]", "title": "[[TODO: degree]]", "org": "[[TODO: institution]]", "meta": "", "text": "", "items": []}]},
+    {"id": "experience", "title": "Relevant Experience", "blocks": [{"id": "role", "type": "entry", "date": "[[TODO: dates]]", "title": "[[TODO: role]]", "org": "[[TODO: organisation]]", "meta": "", "text": "", "items": ["[[TODO: verified contribution]]"]}]},
+    {"id": "skills", "title": "Skills", "blocks": [{"id": "skill-rows", "type": "rows", "rows": [{"label": "Methods", "text": "[[TODO: verified methods]]"}, {"label": "Tools", "text": "[[TODO: verified tools]]"}]}]}
+  ]
+}

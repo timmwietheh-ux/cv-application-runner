@@ -1,0 +1,28 @@
+{
+  "kind": "texts",
+  "title": "Sample portal texts",
+  "portal": "",
+  "intro": "This is a fictional example. Copy the real portal prompts and limits before drafting a submission.",
+  "fields": [
+    {
+      "id": "motivation",
+      "title": "Motivation",
+      "prompt": "Fictional example prompt: Why would you like to join Example Organisation?",
+      "limit": 3000,
+      "required": true,
+      "status": "draft",
+      "text": "I am applying to Example Organisation because I enjoy making everyday work easier to understand and repeat. This letter is a fictional demonstration of the Runner. In a real application, I would name the role, explain why the organisation's work matters to me, and connect that interest to verified experience.\n\nAt the Imaginary Workshop, my sample task was to untangle a shared cupboard of tools. I started by asking colleagues what they needed to find, then built a small inventory and a short guide. The idea was simple: a useful system should keep working when its maker goes home. That habit of listening, testing and documenting is what I would bring to a real team.\n\nI would welcome the chance to learn how your team works and to contribute thoughtfully. Before sending this letter, I will replace every fictional detail with my own evidence and tailor this paragraph to the actual role.",
+      "notes": "The PDF letter reads this field through bodyFrom. Edit the text here once, then rebuild the letter."
+    },
+    {
+      "id": "short-profile",
+      "title": "Short profile",
+      "prompt": "Fictional example prompt: Describe yourself briefly.",
+      "limit": 500,
+      "required": false,
+      "status": "draft",
+      "text": "Fictional sample: I turn messy tasks into small, readable tools and explain them so others can use them.",
+      "notes": "Replace with verified facts before use."
+    }
+  ]
+}

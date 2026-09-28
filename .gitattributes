@@ -1,0 +1,13 @@
+# Normalize line endings for text sources
+* text=auto
+*.tex text
+*.sty text
+*.md text
+*.sh text eol=lf
+*.ps1 text eol=crlf
+
+# Binary assets
+*.pdf binary
+*.jpg binary
+*.jpeg binary
+*.png binary

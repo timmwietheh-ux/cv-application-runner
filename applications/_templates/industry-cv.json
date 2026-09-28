@@ -1,0 +1,12 @@
+{
+  "kind": "cv",
+  "title": "Industry CV starter",
+  "header": {"name": "", "headline": "[[TODO: role headline]]", "tagline": "[[TODO: field or specialty]]", "contacts": ["location", "email"]},
+  "footer": "Curriculum Vitae",
+  "sections": [
+    {"id": "profile", "title": "Profile", "blocks": [{"id": "summary", "type": "summary", "text": "[[TODO: concise profile grounded in real work]]"}]},
+    {"id": "experience", "title": "Experience", "blocks": [{"id": "role", "type": "entry", "date": "[[TODO: dates]]", "title": "[[TODO: role]]", "org": "[[TODO: organisation]]", "meta": "", "text": "", "items": ["[[TODO: outcome you can substantiate]]"]}]},
+    {"id": "education", "title": "Education", "blocks": [{"id": "degree", "type": "entry", "date": "[[TODO: dates]]", "title": "[[TODO: qualification]]", "org": "[[TODO: institution]]", "meta": "", "text": "", "items": []}]},
+    {"id": "skills", "title": "Skills", "blocks": [{"id": "skill-rows", "type": "rows", "rows": [{"label": "Tools", "text": "[[TODO: verified tools]]"}, {"label": "Languages", "text": "[[TODO: verified languages and levels]]"}]}]}
+  ]
+}

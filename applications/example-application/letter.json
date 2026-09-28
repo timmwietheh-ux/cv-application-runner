@@ -1,0 +1,21 @@
+{
+  "kind": "letter",
+  "title": "Sample motivation letter",
+  "pdf": {"title": "John Doe — fictional sample motivation letter", "subject": "Example, not for submission"},
+  "header": {
+    "name": "",
+    "headline": "Maker of Useful Little Systems",
+    "tagline": "Fictional example | Replace before applying",
+    "contacts": ["location", "email"]
+  },
+  "recipient": "Hiring Team\nExample Organisation",
+  "place": "Exampletown",
+  "date": "",
+  "subject": "Sample motivation letter — fictional application",
+  "salutation": "Dear Hiring Team,",
+  "bodyFrom": "portal.json#motivation",
+  "body": [],
+  "closing": "Kind regards,",
+  "signature": "",
+  "enclosures": "Fictional sample CV"
+}

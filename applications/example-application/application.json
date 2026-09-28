@@ -1,0 +1,23 @@
+{
+  "title": "John Doe — fictional example",
+  "organization": "Example Organisation",
+  "category": "general",
+  "status": "preparing",
+  "deadline": "",
+  "summary": "A complete fictional sample showing a two-page CV, a linked one-page motivation letter, portal texts and certificate placeholders. Replace it before applying.",
+  "outputDir": "example-application",
+  "links": [],
+  "documents": [
+    {"id": "cv", "label": "Curriculum vitae", "source": "cv.json", "output": "John_Doe_Sample_CV.pdf"},
+    {"id": "letter", "label": "Motivation letter", "source": "letter.json", "output": "John_Doe_Sample_Motivation_Letter.pdf"},
+    {"id": "portal", "label": "Portal texts", "source": "portal.json", "output": "John_Doe_Sample_Portal_Texts.md"},
+    {"id": "certificates", "label": "Certificate placeholders", "tex": "src/certificates/certificates.tex", "output": "John_Doe_Sample_Certificate_Placeholders.pdf"}
+  ],
+  "notes": [{"label": "Example dossier", "path": "target.md"}],
+  "checklist": [
+    {"text": "Replace the fictional identity and every sample claim with verified personal facts", "done": false},
+    {"text": "Read the real call and record its exact requirements and deadline in target.md", "done": false},
+    {"text": "Replace the certificate placeholders with your own local PDFs", "done": false},
+    {"text": "Build and inspect every page before sending any application", "done": false}
+  ]
+}

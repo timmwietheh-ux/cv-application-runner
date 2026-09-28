@@ -1,0 +1,299 @@
+% ---------------------------------------------------------------------------
+% cvmodern.sty — the reusable block-document design.
+%
+% Loaded with \input{src/common/cvmodern.sty} by the LaTeX files that
+% scripts/cvkit generates from applications/<slug>/*.json. Layout only: every
+% fact and every word lives in the JSON block documents.
+%
+% Palette: blue carries the structure, red highlights key metadata,
+% and yellow appears only in the signature rule.
+% Typeface: Source Sans 3.
+% ---------------------------------------------------------------------------
+\makeatletter
+
+\RequirePackage[a4paper,top=15mm,bottom=19mm,left=18mm,right=18mm,footskip=9mm]{geometry}
+\RequirePackage{fontspec}
+\RequirePackage{microtype}
+\RequirePackage{xcolor}
+\RequirePackage{enumitem}
+\RequirePackage{ragged2e}
+\RequirePackage{fancyhdr}
+\RequirePackage{needspace}
+\RequirePackage{fontawesome5}
+\RequirePackage{hyperref}
+
+% --- Typeface ---------------------------------------------------------------
+\setmainfont{SourceSans3}[
+  UprightFont    = *-Regular,
+  ItalicFont     = *-RegularIt,
+  BoldFont       = *-Semibold,
+  BoldItalicFont = *-SemiboldIt,
+  FontFace       = {l}{n}{*-Light},
+  FontFace       = {l}{it}{*-LightIt},
+  FontFace       = {mb}{n}{*-Medium},
+  FontFace       = {mb}{it}{*-MediumIt},
+  FontFace       = {sb}{n}{*-Semibold},
+  FontFace       = {sb}{it}{*-SemiboldIt},
+  FontFace       = {k}{n}{*-Bold},
+  Ligatures      = TeX,
+]
+\newcommand{\cvLight}{\fontseries{l}\selectfont}
+\newcommand{\cvMedium}{\fontseries{mb}\selectfont}
+\newcommand{\cvSemibold}{\fontseries{sb}\selectfont}
+
+% --- Palette ----------------------------------------------------------------
+\definecolor{runnerblue}{HTML}{005AA9}
+\definecolor{runnerred}{HTML}{A51C30}
+\definecolor{runneryellow}{HTML}{D29F3C}
+\definecolor{textblack}{HTML}{1D1D1D}
+\definecolor{softgray}{HTML}{F4F4F2}
+
+\colorlet{cvInk}{textblack}
+\colorlet{cvMuted}{textblack!66}
+\colorlet{cvFaint}{textblack!45}
+\colorlet{cvHair}{textblack!16}
+\colorlet{cvAccent}{runnerblue}
+\colorlet{cvKey}{runnerred}
+\colorlet{cvSpark}{runneryellow}
+\colorlet{cvPanel}{softgray}
+\colorlet{cvFlag}{runnerred}
+
+\hypersetup{
+  colorlinks = true,
+  urlcolor   = cvInk,
+  linkcolor  = cvInk,
+  pdfcreator = {LuaLaTeX, LaTeX Runner CV design},
+}
+
+% --- Measures ---------------------------------------------------------------
+\newlength{\cvGutter}        \setlength{\cvGutter}{30mm}   % date and label column
+\newlength{\cvSectionSkip}   \setlength{\cvSectionSkip}{15pt}
+\newlength{\cvSectionAfter}  \setlength{\cvSectionAfter}{8pt}
+\newlength{\cvEntrySkip}     \setlength{\cvEntrySkip}{10pt}
+\newlength{\cvCardSkip}      \setlength{\cvCardSkip}{10pt}
+\newlength{\cvColumnSep}     \setlength{\cvColumnSep}{9mm}
+\newlength{\cvRowSkip}       \setlength{\cvRowSkip}{3.6pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\frenchspacing
+\setlength{\JustifyingParindent}{0pt}
+\setlength{\RaggedRightParindent}{0pt}
+\RaggedRight
+\hyphenpenalty=5000
+\exhyphenpenalty=5000
+\widowpenalty=10000
+\clubpenalty=10000
+\emergencystretch=1.5em
+\pagestyle{empty}
+
+\renewcommand{\normalsize}{\fontsize{9.8}{13.4}\selectfont}
+\renewcommand{\small}{\fontsize{8.9}{12.1}\selectfont}
+\renewcommand{\footnotesize}{\fontsize{8.1}{10.6}\selectfont}
+\normalsize\color{cvInk}
+
+% --- Small typographic helpers ---------------------------------------------
+% A line may break after the dot, never before it.
+\newcommand{\cvDot}{\unskip\nobreak\hspace{0.42em}{\color{cvFaint}\textperiodcentered}\hspace{0.42em}\ignorespaces}
+% Visible marker for unverified or missing facts. It must never reach a sent PDF.
+\newcommand{\cvPlaceholder}[1]{{\cvSemibold\color{cvFlag}[TODO: #1]}}
+% The short blue dash used as bullet in entries and cards.
+\newcommand{\cv@dash}{\raisebox{0.52ex}{\color{cvAccent}\rule{0.42em}{0.95pt}}}
+
+% --- Signature rule: blue, red and a spark of yellow, then a hairline -------
+\newcommand{\cvSignatureRule}{%
+  \noindent
+  {\color{cvAccent}\rule{24mm}{1.7pt}}%
+  {\color{cvKey}\rule{7mm}{1.7pt}}%
+  {\color{cvSpark}\rule{3.5mm}{1.7pt}}%
+  {\color{cvHair}\rule[0.65pt]{\dimexpr\linewidth-34.5mm\relax}{0.4pt}}%
+  \par
+}
+
+% --- Header -----------------------------------------------------------------
+% \cvContact{fontawesome icon}{visible text}{link target or empty}
+\newcommand{\cvContact}[3]{%
+  \mbox{\if\relax\detokenize{#3}\relax #2\else\href{#3}{#2}\fi
+  \hspace{0.6em}\makebox[1.05em][c]{\color{cvAccent}\small\faIcon{#1}}}\par
+}
+% \cvHeader{name}{headline}{tagline}{\cvContact lines}
+\newcommand{\cvHeader}[4]{%
+  \noindent
+  \begin{minipage}[b]{0.62\linewidth}
+    {\fontsize{28}{31}\selectfont\cvSemibold\color{cvInk}#1\par}
+    \vspace{5pt}
+    {\fontsize{11.4}{14.2}\selectfont\color{cvAccent}#2\par}
+    \if\relax\detokenize{#3}\relax\else
+      \vspace{1.5pt}{\fontsize{9.6}{12.6}\selectfont\color{cvMuted}#3\par}%
+    \fi
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[b]{0.37\linewidth}
+    \raggedleft\small\color{cvInk}#4%
+  \end{minipage}%
+  \par\vspace{10pt}
+  \cvSignatureRule
+  \vspace{2pt}
+}
+
+% --- Sections ---------------------------------------------------------------
+% \cvSection[lines]{title}: letter-spaced blue capitals and a hairline to the
+% margin. The optional argument reserves room for the title and the first
+% block, so a title never stands alone at the foot of a page.
+\newcommand{\cvSection}[2][6]{%
+  \par\Needspace{#1\baselineskip}%
+  \vspace{\cvSectionSkip}%
+  \noindent{\fontsize{9.2}{11}\selectfont\cvSemibold\color{cvAccent}%
+    \addfontfeatures{LetterSpace=10}\MakeUppercase{#2}}%
+  \hspace{0.8em}{\color{cvHair}\leaders\hrule height 3.25pt depth -2.85pt\hfill}%
+  \par\nopagebreak\vspace{\cvSectionAfter}%
+}
+
+% --- Profile summary --------------------------------------------------------
+% A soft panel with a blue edge. The text is measured first, so the panel and
+% its edge always match the height of the text.
+\newsavebox{\cv@summarybox}
+\newcommand{\cvSummary}[1]{%
+  \par\noindent
+  \sbox{\cv@summarybox}{%
+    \begin{minipage}{\dimexpr\linewidth-2.4em\relax}%
+      \fontsize{10.3}{14.6}\selectfont\leavevmode\color{cvInk}\justifying #1%
+    \end{minipage}}%
+  \begingroup\setlength{\fboxsep}{0pt}%
+  \colorbox{cvPanel}{%
+    {\color{cvAccent}\rule[-\dimexpr\dp\cv@summarybox+7.5pt\relax]{1.8pt}{\dimexpr\ht\cv@summarybox+\dp\cv@summarybox+15pt\relax}}%
+    \hspace{1.1em}\usebox{\cv@summarybox}\hspace{1em}}%
+  \endgroup
+  \par
+}
+
+% --- Entries ----------------------------------------------------------------
+% A list whose label is the date, so the dates stand in the gutter and long
+% entries may still break across pages.
+\newcommand{\cv@gutterlist}{%
+  \begin{list}{}{%
+    \setlength{\leftmargin}{\cvGutter}%
+    \setlength{\labelwidth}{\cvGutter}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parsep}{0pt}%
+    \setlength{\topsep}{0pt}%
+    \setlength{\partopsep}{0pt}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\rightmargin}{0pt}%
+    \renewcommand{\makelabel}[1]{##1\hfil}}%
+}
+\newcommand{\cv@label}[2]{%
+  \parbox[t]{\dimexpr\cvGutter-3.5mm\relax}{\raggedright\small\leavevmode#1\strut#2\strut}%
+}
+% \begin{cvEntry}[lines kept together]{dates}{title}{organisation}{key facts}
+%   body
+% \end{cvEntry}
+% The optional argument is the generator's estimate of the entry height in
+% lines. An entry that fits on a page therefore never starts at a page foot.
+\newenvironment{cvEntry}[5][4]{%
+  \par\Needspace{#1\baselineskip}%
+  \cv@gutterlist
+  \item[\cv@label{\color{cvMuted}}{#2}]%
+  {\cvSemibold\color{cvInk}#3}%
+  \if\relax\detokenize{#4}\relax\else
+    \hfill\hspace{1em}{\small\color{cvAccent}#4}%
+  \fi
+  \par
+  \if\relax\detokenize{#5}\relax\else
+    {\small\color{cvKey}#5\par}%
+  \fi
+  \vspace{2.8pt}%
+}{%
+  \par\end{list}\vspace{\cvEntrySkip}%
+}
+
+% Bullets inside entries: a short blue dash with a true hanging indent.
+\newenvironment{cvItems}{%
+  \begin{itemize}[
+    leftmargin=1.05em, labelsep=0.5em, labelwidth=0.55em, align=left,
+    label={\cv@dash},
+    topsep=1.2pt, itemsep=2.4pt, parsep=0pt, partopsep=0pt]%
+}{%
+  \end{itemize}%
+}
+
+% \cvRow{label}{text}: a compact key-value line with the label in the gutter.
+\newcommand{\cvRow}[2]{%
+  \par
+  \cv@gutterlist
+  \item[\cv@label{\cvSemibold\color{cvInk}}{#1}]%
+  #2\par
+  \end{list}\vspace{\cvRowSkip}%
+}
+
+% --- Cards ------------------------------------------------------------------
+% \cvCard{title}{\cvCardItem{...}...}; \cvCardRow places two cards side by side.
+\newcommand{\cvCard}[2]{%
+  {\cvSemibold\color{cvAccent}#1\par}\vspace{2pt}%
+  {\small #2\par}%
+}
+\newcommand{\cvCardItem}[1]{%
+  \par\noindent\hangindent=1.05em\hangafter=1
+  \makebox[1.05em][l]{\cv@dash}#1\par\vspace{1.8pt}%
+}
+\newcommand{\cvCardRow}[2]{%
+  \par\Needspace{5\baselineskip}\noindent
+  \begin{minipage}[t]{\dimexpr(\linewidth-\cvColumnSep)/2\relax}#1\end{minipage}%
+  \hspace{\cvColumnSep}%
+  \begin{minipage}[t]{\dimexpr(\linewidth-\cvColumnSep)/2\relax}#2\end{minipage}%
+  \par\vspace{\cvCardSkip}%
+}
+
+% --- Plain text and page control -------------------------------------------
+\newcommand{\cvText}[1]{\par\noindent#1\par\vspace{5pt}}
+\newcommand{\cvPageBreak}{\par\newpage}
+
+% --- Letters ----------------------------------------------------------------
+% The letter reuses \cvHeader, so CV and letter read as one set.
+% \cvLetterAddress{recipient lines separated by \\}{place and date}
+\newcommand{\cvLetterAddress}[2]{%
+  \par\vspace{16pt}\noindent
+  \begin{minipage}[t]{0.58\linewidth}\raggedright\small\color{cvInk}#1\end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.40\linewidth}\raggedleft\small\color{cvMuted}#2\end{minipage}%
+  \par\vspace{20pt}%
+}
+% \cvLetterSubject{subject}: the one line a reader sees first.
+\newcommand{\cvLetterSubject}[1]{%
+  \noindent{\fontsize{11.6}{15}\selectfont\cvSemibold\color{cvAccent}#1\par}\vspace{13pt}%
+}
+% Body text: slightly larger than the CV, justified, paragraphs set off by space.
+\newenvironment{cvLetterBody}{%
+  \par\fontsize{10.4}{15.1}\selectfont\color{cvInk}%
+  \setlength{\parskip}{7.2pt}\justifying
+}{%
+  \par
+}
+% \cvLetterClosing{closing phrase}{name}
+\newcommand{\cvLetterClosing}[2]{%
+  \par\vspace{10pt}\noindent#1\par\vspace{24pt}%
+  \noindent{\cvSemibold#2}\par
+}
+% \cvLetterEnclosures{list}
+\newcommand{\cvLetterEnclosures}[1]{%
+  \par\vspace{16pt}\noindent{\small\color{cvMuted}\cvSemibold Enclosures\quad}{\small\color{cvMuted}#1}\par
+}
+
+% --- Footer -----------------------------------------------------------------
+\newcommand{\cv@footername}{}
+\newcommand{\cv@footerlabel}{Curriculum Vitae}
+\fancypagestyle{cvpage}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \fancyfoot[L]{\footnotesize\color{cvFaint}\cv@footername\cvDot\cv@footerlabel}%
+  \fancyfoot[R]{\footnotesize\color{cvFaint}\thepage\,/\,\pageref*{cv:lastpage}}%
+}
+% \cvFooter{name}{label}: switch on the discreet page footer.
+\newcommand{\cvFooter}[2]{%
+  \renewcommand{\cv@footername}{#1}\renewcommand{\cv@footerlabel}{#2}%
+  \pagestyle{cvpage}\thispagestyle{cvpage}%
+}
+\AtEndDocument{\label{cv:lastpage}}
+
+\makeatother

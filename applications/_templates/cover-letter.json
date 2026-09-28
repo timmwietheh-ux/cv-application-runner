@@ -1,0 +1,19 @@
+{
+  "kind": "letter",
+  "title": "Cover letter starter",
+  "header": {"name": "", "headline": "[[TODO: professional headline]]", "tagline": "", "contacts": ["location", "email"]},
+  "recipient": "[[TODO: recipient]]",
+  "place": "",
+  "date": "",
+  "subject": "Application for [[TODO: role]]",
+  "salutation": "Dear Hiring Team,",
+  "bodyFrom": "",
+  "body": [
+    {"id": "opening", "type": "paragraph", "text": "[[TODO: why this role and organisation]]"},
+    {"id": "evidence", "type": "paragraph", "text": "[[TODO: verified experience that meets the requirements]]"},
+    {"id": "closing", "type": "paragraph", "text": "[[TODO: contribution and next step]]"}
+  ],
+  "closing": "Kind regards,",
+  "signature": "",
+  "enclosures": ""
+}

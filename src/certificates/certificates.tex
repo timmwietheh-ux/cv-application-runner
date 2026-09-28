@@ -1,0 +1,40 @@
+% !TeX program = lualatex
+% Three visible placeholders. Place private PDFs in assets/attachments/certificates/
+% using the filenames below; each existing PDF replaces its placeholder.
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=22mm]{geometry}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\setmainfont{SourceSans3}
+\definecolor{runnerblue}{HTML}{005AA9}
+\hypersetup{pdftitle={Certificate placeholders — fictional sample},pdfauthor={John Doe fictional example}}
+\pagestyle{empty}
+\newcommand{\BlankCertificate}[2]{%
+  \null\vfill
+  \begin{center}
+    {\color{runnerblue}\LARGE\bfseries #1\par}
+    \vspace{14mm}
+    {\Large SAMPLE PLACEHOLDER\par}
+    \vspace{7mm}
+    {\large No certificate is included in this repository.\par}
+    \vspace{9mm}
+    \fbox{\parbox{0.78\linewidth}{\centering
+      Add your own PDF at\\[2mm]
+      \texttt{assets/attachments/certificates/#2}\\[2mm]
+      and rebuild this document. Keep the PDF private unless you deliberately choose to share it.}}
+  \end{center}
+  \vfill\clearpage
+}
+\begin{document}
+\IfFileExists{assets/attachments/certificates/degree.pdf}
+  {\includepdf[pages=-]{assets/attachments/certificates/degree.pdf}}
+  {\BlankCertificate{Degree certificate}{degree.pdf}}
+\IfFileExists{assets/attachments/certificates/transcript.pdf}
+  {\includepdf[pages=-]{assets/attachments/certificates/transcript.pdf}}
+  {\BlankCertificate{Transcript of records}{transcript.pdf}}
+\IfFileExists{assets/attachments/certificates/other.pdf}
+  {\includepdf[pages=-]{assets/attachments/certificates/other.pdf}}
+  {\BlankCertificate{Other certificate}{other.pdf}}
+\end{document}

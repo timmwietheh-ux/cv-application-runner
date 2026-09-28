@@ -1,0 +1,214 @@
+{
+  "kind": "cv",
+  "title": "Sample curriculum vitae",
+  "pdf": {
+    "title": "John Doe — fictional sample CV",
+    "subject": "Two-page example, not for submission",
+    "keywords": "fictional, sample, curriculum vitae"
+  },
+  "header": {
+    "name": "",
+    "headline": "Maker of Useful Little Systems",
+    "tagline": "Fictional example | Replace before applying",
+    "contacts": [
+      "location",
+      "email"
+    ]
+  },
+  "footer": "FICTIONAL SAMPLE — replace before use",
+  "sections": [
+    {
+      "id": "profile",
+      "title": "Profile",
+      "blocks": [
+        {
+          "id": "profile-text",
+          "type": "summary",
+          "text": "This is a fictional CV for exploring LaTeX Runner. John Doe likes turning messy, repetitive tasks into small tools that people can actually use. The sample entries below are intentionally invented. Replace every claim and contact detail before sending a real application."
+        }
+      ]
+    },
+    {
+      "id": "experience",
+      "title": "Experience",
+      "blocks": [
+        {
+          "id": "toolmaker",
+          "type": "entry",
+          "date": "2023 - present",
+          "title": "Prototype Toolmaker",
+          "org": "Imaginary Workshop",
+          "meta": "Fictional role | small team",
+          "text": "",
+          "items": [
+            "Built a dashboard that finally answered the office question: which coffee mug belongs to whom?",
+            "Turned a chaotic box of notes into a searchable catalogue with clear names and careful version history.",
+            "Wrote short instructions so a colleague could run each tool without the original author nearby."
+          ]
+        },
+        {
+          "id": "library-helper",
+          "type": "entry",
+          "date": "2021 - 2023",
+          "title": "Community Library Helper",
+          "org": "Exampletown Library",
+          "meta": "Fictional volunteering",
+          "text": "",
+          "items": [
+            "Organised a lending shelf for tools and games, including a checklist that stopped missing pieces.",
+            "Helped visitors try unfamiliar software in plain language."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "title": "Education",
+      "blocks": [
+        {
+          "id": "degree",
+          "type": "entry",
+          "date": "2018 - 2021",
+          "title": "B.A. in Practical Curiosity",
+          "org": "Sample University",
+          "meta": "Invented degree for demonstration",
+          "text": "Final project: a map of the office plants and who remembered to water them.",
+          "items": []
+        }
+      ]
+    },
+    {
+      "id": "approach",
+      "title": "How I Work",
+      "blocks": [
+        {
+          "id": "approach-cards",
+          "type": "cards",
+          "cards": [
+            {
+              "title": "Ask first",
+              "items": [
+                "Find the actual task before choosing a tool.",
+                "Write down the constraints people mention."
+              ]
+            },
+            {
+              "title": "Make it repeatable",
+              "items": [
+                "Keep source files readable.",
+                "Test the handover with a colleague."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "break",
+      "title": "",
+      "blocks": [
+        {
+          "id": "page-two",
+          "type": "pagebreak"
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "title": "Selected Projects",
+      "blocks": [
+        {
+          "id": "project-one",
+          "type": "entry",
+          "date": "2024",
+          "title": "The Great Cable Label Experiment",
+          "org": "Personal project",
+          "meta": "Fictional sample",
+          "text": "Designed a simple label and inventory workflow for a shared equipment cupboard.",
+          "items": [
+            "Grouped cables by purpose and recorded where each belonged.",
+            "Made a one-page guide that a new team member could follow."
+          ]
+        },
+        {
+          "id": "project-two",
+          "type": "entry",
+          "date": "2022",
+          "title": "Tiny Task Tracker",
+          "org": "Open demonstration",
+          "meta": "Fictional sample",
+          "text": "Prototyped a local list for recurring chores with readable export files.",
+          "items": [
+            "Kept the interface small enough to explain in one minute."
+          ]
+        },
+        {
+          "id": "project-three",
+          "type": "entry",
+          "date": "2021",
+          "title": "A Very Small Field Guide",
+          "org": "Exampletown Library",
+          "meta": "Fictional sample",
+          "text": "Made a friendly guide to the library's lending shelf.",
+          "items": [
+            "Used pictures and plain language so visitors could find tools without asking for help.",
+            "Revised the guide after watching where first-time visitors paused."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "title": "Skills",
+      "blocks": [
+        {
+          "id": "skills-rows",
+          "type": "rows",
+          "rows": [
+            {
+              "label": "Methods",
+              "text": "Writing clear instructions | organising information | testing small workflows"
+            },
+            {
+              "label": "Tools",
+              "text": "Spreadsheets | text editors | version control"
+            },
+            {
+              "label": "Working style",
+              "text": "Ask useful questions | document decisions | hand work over cleanly"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "community",
+      "title": "Community",
+      "blocks": [
+        {
+          "id": "community-entry",
+          "type": "entry",
+          "date": "2020 - 2022",
+          "title": "Workshop Host",
+          "org": "Imaginary Makers Club",
+          "meta": "Fictional sample",
+          "text": "Hosted informal sessions where people brought one stubborn everyday problem and left with a plan.",
+          "items": [
+            "Kept notes short enough for attendees to use the next day."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "note",
+      "title": "About this example",
+      "blocks": [
+        {
+          "id": "sample-note",
+          "type": "text",
+          "text": "Every education, role, project and skill on these two pages is sample text. Replace them with evidence from your own records. Keep the page break only if a two-page CV suits the actual application."
+        }
+      ]
+    }
+  ]
+}
